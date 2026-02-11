@@ -1,6 +1,6 @@
 # Bilibili 热门视频多维度分析系统
 
-> 基于 Bilibili 官方每周热门榜单（第70–354期），对视频数据进行爬取、清洗、统计分析与可视化，挖掘用户行为偏好与内容生态特征。
+> 基于 Bilibili 官方每周热门榜单（第1–354期），对视频数据进行爬取、清洗、统计分析与可视化，挖掘用户行为偏好与内容生态特征。
 
 ![Python](https://img.shields.io/badge/Python-3.8%2B-blue?logo=python)
 ![Spark](https://img.shields.io/badge/Apache_Spark-3.x-orange?logo=apachespark)

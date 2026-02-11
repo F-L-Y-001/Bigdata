@@ -22,6 +22,8 @@
 
 ## 📂 目录结构
 
+```bash
+
 CO2/
 ├── GCB2022v27_MtCO2_flat.csv # 原始数据（来自 Global Carbon Budget 2022）
 ├── dataset.csv # 清洗后的结构化数据（由 data_clean.py 生成）

@@ -19,17 +19,3 @@
 - 🎯 基于历史排名的二分类模型（预测是否进入 Top10）
 
 所有图表均标注作者信息，可直接用于报告或展示。
-
----
-
-## 📂 目录结构
-
-```bash
-.
-├── bilibili_crawler.py      # 爬虫：获取 Bilibili 每周热门榜单（JSON）
-├── data_clean.py            # 数据清洗：处理缺失值、异常值、文本标准化
-├── data_analysis.py         # 核心分析：PySpark 统计 + 机器学习建模
-├── visualize_with_plt.py    # 可视化：生成7类图表（柱状图/热力图等）
-├── bilibili_weekly_clean.csv # 清洗后的结构化数据（CSV）
-├── bilibili_week.txt        # Spark 兼容的 TSV 格式数据
-└── plots_plt/               # 输出目录：所有高清图表（PNG, 300dpi）

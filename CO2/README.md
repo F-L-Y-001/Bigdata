@@ -20,20 +20,6 @@
 
 ---
 
-## 📂 目录结构
-
-```bash
-
-CO2/
-├── GCB2022v27_MtCO2_flat.csv # 原始数据（来自 Global Carbon Budget 2022）
-├── dataset.csv # 清洗后的结构化数据（由 data_clean.py 生成）
-├── data_clean.py # 数据清洗脚本：过滤无效记录、填充缺失值
-├── data_analysis.py # 核心分析脚本：PySpark 聚合 + Matplotlib 可视化
-├── top5_total.png # 输出：历史总排放 Top5 国家柱状图
-└── emissions_2000+.png # 输出：2000年后排放占比饼图
-
----
-
 ## ⚙️ 技术栈
 
 | 功能 | 工具 |

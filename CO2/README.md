@@ -24,7 +24,7 @@
 
 | 功能 | 工具 |
 |------|------|
-| 数据源 | [Global Carbon Budget 2022](https://doi.org/10.5281/zenodo.7409077) |
+| 数据源 | [Global Carbon Budget 2022]|
 | 数据处理 | `pandas`, `PySpark` |
 | 可视化 | `matplotlib` |
 | 字段说明 | `Country`, `Year`, `Total`, `Coal`, `Oil`, `Gas`, `Cement`, `Flaring`, `Other`, `PerCapita` |

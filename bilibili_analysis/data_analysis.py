@@ -6,14 +6,14 @@ from pyspark.ml.feature import VectorAssembler
 from pyspark.ml.classification import LogisticRegression
 from pyspark.ml.evaluation import MulticlassClassificationEvaluator, BinaryClassificationEvaluator
 from pyspark.ml.stat import Correlation
-from pyspark.sql.functions import when  # 👈 新增导入
+from pyspark.sql.functions import when
 import os
 import jieba
 import re
 import pandas as pd
 
 
-# ==================== 1. 初始化 Spark 和加载数据（增强健壮性）====================
+# 初始化Spark和加载数据
 def initialize(txt_file):
     spark = SparkSession.builder \
         .appName("BilibiliWeeklyAnalysis") \
@@ -26,7 +26,6 @@ def initialize(txt_file):
         if not line:
             return None
         fields = line.split('\t')
-        # 严格要求 14 个字段
         if len(fields) != 14:
             return None
         try:
@@ -54,7 +53,7 @@ def initialize(txt_file):
         .filter(lambda x: x is not None)
 
     schema = StructType([
-        StructField("up", StringType(), True),      # 改为 nullable=True 更安全
+        StructField("up", StringType(), True),
         StructField("time", StringType(), True),
         StructField("title", StringType(), True),
         StructField("desc", StringType(), True),
@@ -75,8 +74,7 @@ def initialize(txt_file):
     return spark, df
 
 
-# ==================== 2. 统计分析函数（保持不变）====================
-
+# 统计分析函数
 def top_popular_up(spark, base_dir):
     result = spark.sql("""
         SELECT up, COUNT(*) AS popular_up_times 
@@ -86,11 +84,10 @@ def top_popular_up(spark, base_dir):
         LIMIT 10
     """)
     result.toPandas().to_csv(os.path.join(base_dir, 'top_popular_up.csv'), index=False)
-    print("✅ Top10 UP主已保存")
+    print("Top10 UP主已保存")
 
 
 def top_popular_up_coin(spark, base_dir):
-    """统计投币总数最多的Top10 UP主"""
     result = spark.sql("""
         SELECT up, SUM(coin) AS coin 
         FROM data 
@@ -99,7 +96,7 @@ def top_popular_up_coin(spark, base_dir):
         LIMIT 10
     """)
     result.toPandas().to_csv(os.path.join(base_dir, 'top_popular_up_coin.csv'), index=False)
-    print("✅ 投币最多的Top10 UP主已保存")
+    print("投币最多的Top10 UP主已保存")
 
 
 def top_popular_subject(spark, base_dir):
@@ -111,7 +108,7 @@ def top_popular_subject(spark, base_dir):
         LIMIT 10
     """)
     result.toPandas().to_csv(os.path.join(base_dir, 'top_popular_subject.csv'), index=False)
-    print("✅ Top10 视频分区已保存")
+    print("Top10 视频分区已保存")
 
 
 def top_popular_view(spark, base_dir):
@@ -122,7 +119,7 @@ def top_popular_view(spark, base_dir):
         LIMIT 10
     """)
     result.toPandas().to_csv(os.path.join(base_dir, 'video_view_data.csv'), index=False)
-    print("✅ Top10 播放量视频已保存")
+    print("Top10 播放量视频已保存")
 
 
 def top_popular_danmaku(spark, base_dir):
@@ -155,11 +152,9 @@ def top_popular_like(spark, base_dir):
         os.path.join(base_dir, 'top_popular_like.csv'), index=False)
 
 
-# ==================== 3. 词频统计（标题）====================
-
+# 词频统计
 def word_count(spark, base_dir):
     def pretty_cut(sentence):
-        # 只保留中文字符
         chinese_only = ''.join(re.findall('[\u4e00-\u9fa5]', str(sentence)))
         cut_list = jieba.lcut(chinese_only, cut_all=False)
         stopwords = {'的', '了', '在', '是', '我', '有', '和', '就', '这', '也', '都', '很', '会', '上', '一', '个',
@@ -180,15 +175,14 @@ def word_count(spark, base_dir):
 
     save_path = os.path.join(base_dir, 'title_word.csv')
     wordCountDF_filtered.toPandas().to_csv(save_path, index=False)
-    print("✅ 标题词频前300已保存")
+    print("标题词频前300已保存")
 
 
-# ==================== 4. 机器学习分析（MLlib）====================
-
+# 机器学习分析（MLlib）
 def ml_analysis(spark, base_dir):
     df = spark.sql("SELECT * FROM data")
 
-    # 数据预处理：移除非数值特征，生成标签
+    # 移除非数值特征，生成标签
     df = df.drop('up', 'time', 'title', 'desc', 'rcmd_reason', 'tname')
     df = df.withColumn('label', when(df.his_rank <= 10, 1).otherwise(0))
 
@@ -202,12 +196,11 @@ def ml_analysis(spark, base_dir):
     print(f"训练数据集总数: {training_data.count()}")
     print(f"测试数据集总数: {test_data.count()}")
 
-    # 相关性矩阵（使用 Pandas 计算更简单，或用 Spark）
-    # 这里仍用 Spark 的 Correlation
+    # 相关性矩阵
     cor_mat = Correlation.corr(transformed_data, "features", "spearman").head()[0]
     cor_df = pd.DataFrame(cor_mat.toArray(), columns=required_features, index=required_features)
     cor_df.to_csv(os.path.join(base_dir, 'correlation_matrix.csv'))
-    print("✅ 相关性矩阵已保存")
+    print("相关性矩阵已保存")
 
     # 训练逻辑回归模型
     lr = LogisticRegression(labelCol='label', featuresCol='features', maxIter=15)
@@ -225,10 +218,8 @@ def ml_analysis(spark, base_dir):
 
     # 保存模型
     model.write().overwrite().save(os.path.join(base_dir, "lr_model"))
-    print("✅ 模型已保存")
+    print("模型已保存")
 
-
-# ==================== 5. 主函数 ====================
 
 if __name__ == '__main__':
     txt_file = 'hdfs://localhost:9000/user/hadoop/bilibili_week.txt'
@@ -254,4 +245,4 @@ if __name__ == '__main__':
     ml_analysis(spark, base_dir)
 
     spark.stop()
-    print("🎉 所有分析任务完成！")
+    print("所有分析任务完成！")

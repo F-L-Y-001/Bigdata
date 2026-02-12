@@ -38,7 +38,7 @@ def main():
     END_WEEK = 354
     all_videos = []
 
-    # 尝试加载已有数据（断点续爬）
+    # 加载已有数据（断点续爬）
     temp_file = "data/temp_bilibili_weekly_data.json"
     if os.path.exists(temp_file):
         with open(temp_file, "r", encoding="utf-8") as f:
@@ -64,7 +64,6 @@ def main():
         with open(temp_file, "w", encoding="utf-8") as f:
             json.dump(all_videos, f, ensure_ascii=False, indent=2)
 
-        # 关键：加大延迟！
         delay = random.uniform(2.5, 4.0)
         print(f"等待 {delay:.1f} 秒...\n")
         time.sleep(delay)
@@ -72,7 +71,7 @@ def main():
     # 最终保存
     with open("data/bilibili_weekly_data.json", "w", encoding="utf-8") as f:
         json.dump(all_videos, f, ensure_ascii=False, indent=2)
-    print("✅ 全部完成！")
+    print("全部完成！")
 
 
 if __name__ == "__main__":
